@@ -1,0 +1,70 @@
+name: Deploy Vercel
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+jobs:
+  deploy:
+    name: Deploy frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: golden-owl-frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: golden-owl-frontend/package-lock.json
+
+      - name: Validate Vercel secrets
+        if: env.VERCEL_TOKEN == '' || env.VERCEL_ORG_ID == '' || env.VERCEL_PROJECT_ID == ''
+        run: |
+          echo "Missing VERCEL_TOKEN, VERCEL_ORG_ID, or VERCEL_PROJECT_ID repository secret."
+          exit 1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Select Vercel environment
+        shell: bash
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "push" && ("${GITHUB_REF}" == "refs/heads/main" || "${GITHUB_REF}" == "refs/heads/master") ]]; then
+            echo "VERCEL_ENVIRONMENT=production" >> "$GITHUB_ENV"
+            echo "VERCEL_PROD_FLAG=--prod" >> "$GITHUB_ENV"
+          else
+            echo "VERCEL_ENVIRONMENT=preview" >> "$GITHUB_ENV"
+            echo "VERCEL_PROD_FLAG=" >> "$GITHUB_ENV"
+          fi
+
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment="$VERCEL_ENVIRONMENT" --token="$VERCEL_TOKEN"
+
+      - name: Build Vercel output
+        run: vercel build $VERCEL_PROD_FLAG --token="$VERCEL_TOKEN"
+
+      - name: Deploy prebuilt output
+        run: vercel deploy --prebuilt $VERCEL_PROD_FLAG --token="$VERCEL_TOKEN"

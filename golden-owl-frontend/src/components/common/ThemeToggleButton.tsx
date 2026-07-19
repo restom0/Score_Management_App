@@ -1,12 +1,16 @@
 import { useTheme } from "../../context/ThemeContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 export const ThemeToggleButton: React.FC = () => {
-  const { toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
+  const { t } = useLanguage();
 
   return (
     <button
       onClick={toggleTheme}
-      className="relative flex items-center justify-center text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-dark-900 h-11 w-11 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+      className="relative flex h-11 min-w-11 items-center justify-center gap-2 rounded-lg border border-emerald-200 bg-white px-3 text-sm font-semibold text-emerald-800 transition-colors hover:bg-emerald-50 dark:border-emerald-400/20 dark:bg-white/[0.05] dark:text-emerald-100 dark:hover:bg-white/[0.08]"
+      aria-label={t("theme")}
+      title={theme === "light" ? t("dark") : t("light")}
     >
       <svg
         className="hidden dark:block"
@@ -36,6 +40,9 @@ export const ThemeToggleButton: React.FC = () => {
           fill="currentColor"
         />
       </svg>
+      <span className="hidden sm:block">
+        {theme === "light" ? t("light") : t("dark")}
+      </span>
     </button>
   );
 };

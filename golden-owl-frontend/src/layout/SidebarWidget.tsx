@@ -1,23 +1,19 @@
+import { useLanguage } from "../context/LanguageContext";
+
 export default function SidebarWidget() {
+  const { t } = useLanguage();
+
   return (
-    <div
-      className={`
-        mx-auto mb-10 w-full max-w-60 rounded-2xl bg-gray-50 px-4 py-5 text-center dark:bg-white/[0.03]`}
-    >
-      <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">
-        #1 Tailwind CSS Dashboard
+    <div className="mx-auto mb-10 w-full max-w-60 rounded-lg border border-emerald-900/10 bg-emerald-50 px-4 py-5 dark:border-emerald-300/10 dark:bg-white/[0.04]">
+      <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-coral-500 text-white">
+        <i className="pi pi-database" />
+      </div>
+      <h3 className="mb-2 font-semibold text-slate-950 dark:text-white">
+        {t("dataWorkspace")}
       </h3>
-      <p className="mb-4 text-gray-500 text-theme-sm dark:text-gray-400">
-        Leading Tailwind CSS Admin Template with 400+ UI Component and Pages.
+      <p className="text-theme-sm text-slate-600 dark:text-emerald-100/70">
+        {t("dataWorkspaceDesc")}
       </p>
-      <a
-        href="https://tailadmin.com/pricing"
-        target="_blank"
-        rel="nofollow"
-        className="flex items-center justify-center p-3 font-medium text-white rounded-lg bg-brand-500 text-theme-sm hover:bg-brand-600"
-      >
-        Purchase Plan
-      </a>
     </div>
   );
 }
