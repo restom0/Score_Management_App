@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { type SyntheticEvent, useEffect, useMemo, useState } from "react";
 import "chart.js/auto";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
@@ -143,7 +143,7 @@ export default function Home() {
     };
   }, [theme]);
 
-  const handleScoreSearch = (event: FormEvent) => {
+  const handleScoreSearch = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!canSearch) {
       setScoreError(t("invalidRegistrationNumber"));
@@ -186,9 +186,7 @@ export default function Home() {
           </div>
         </section>
 
-        {dashboardError && (
-          <Message severity="error" text={dashboardError || t("loadFailed")} />
-        )}
+        {dashboardError && <Message severity="error" text={dashboardError} />}
 
         <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <MetricCard
@@ -248,9 +246,7 @@ export default function Home() {
               />
             </form>
 
-            {scoreError && (
-              <Message severity="warn" text={scoreError || t("scoreNotFound")} />
-            )}
+            {scoreError && <Message severity="warn" text={scoreError} />}
 
             {!score && !scoreLoading && !scoreError && (
               <div className="gscore-empty">{t("noScoreYet")}</div>
@@ -355,11 +351,7 @@ export default function Home() {
             <Column
               field="total"
               header={t("total")}
-              body={(row: TopGroupAStudentResponse) => (
-                <strong className="text-emerald-700 dark:text-emerald-200">
-                  {formatScore(row.total)}
-                </strong>
-              )}
+              body={renderTotalScore}
               sortable
             />
           </DataTable>
@@ -375,13 +367,13 @@ function MetricCard({
   value,
   loading,
   tone,
-}: {
+}: Readonly<{
   icon: string;
   label: string;
   value: string;
   loading: boolean;
   tone: "emerald" | "blue" | "coral";
-}) {
+}>) {
   return (
     <Card className="gscore-card">
       <div className="flex items-center gap-4">
@@ -405,7 +397,7 @@ function MetricCard({
   );
 }
 
-function ScoreMeta({ label, value }: { label: string; value: string }) {
+function ScoreMeta({ label, value }: Readonly<{ label: string; value: string }>) {
   return (
     <div>
       <div className="text-xs font-semibold uppercase text-slate-500 dark:text-emerald-100/60">
@@ -426,6 +418,14 @@ function ScoreSkeleton() {
         ))}
       </div>
     </div>
+  );
+}
+
+function renderTotalScore(row: TopGroupAStudentResponse) {
+  return (
+    <strong className="text-emerald-700 dark:text-emerald-200">
+      {formatScore(row.total)}
+    </strong>
   );
 }
 

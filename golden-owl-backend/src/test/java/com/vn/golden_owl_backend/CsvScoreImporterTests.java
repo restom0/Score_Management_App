@@ -27,11 +27,11 @@ class CsvScoreImporterTests {
 		assertThat(scoreRecordRepository.findByRegistrationNumber("01000011"))
 				.isPresent()
 				.get()
-				.satisfies(record -> {
-					assertThat(record.getMath()).isEqualTo(8.4);
-					assertThat(record.getPhysics()).isEqualTo(6.0);
-					assertThat(record.getGeography()).isNull();
-					assertThat(record.getForeignLanguageCode()).isEqualTo("N1");
+				.satisfies(scoreRecord -> {
+					assertThat(scoreRecord.getMath()).isEqualTo(8.4);
+					assertThat(scoreRecord.getPhysics()).isEqualTo(6.0);
+					assertThat(scoreRecord.getGeography()).isNull();
+					assertThat(scoreRecord.getForeignLanguageCode()).isEqualTo("N1");
 				});
 	}
 }

@@ -32,17 +32,12 @@ const AppSidebar: React.FC = () => {
   const location = useLocation();
   const { t } = useLanguage();
   const expanded = isExpanded || isHovered || isMobileOpen;
+  const sidebarWidthClass = expanded ? "w-[290px]" : "w-[90px]";
 
   return (
     <aside
       className={`fixed left-0 top-0 z-50 mt-16 flex h-screen flex-col border-r border-emerald-900/10 bg-white px-4 text-slate-950 transition-all duration-300 ease-in-out dark:border-white/10 dark:bg-[#101916] lg:mt-0
-        ${
-          isExpanded || isMobileOpen
-            ? "w-[290px]"
-            : isHovered
-              ? "w-[290px]"
-              : "w-[90px]"
-        }
+        ${sidebarWidthClass}
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}

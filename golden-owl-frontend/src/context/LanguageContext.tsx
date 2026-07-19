@@ -302,27 +302,27 @@ function isSupportedLanguage(value: string | null): value is Language {
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [language, setLanguageState] = useState<Language>("en");
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>("en");
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem("language");
     if (isSupportedLanguage(savedLanguage)) {
-      setLanguageState(savedLanguage);
+      setSelectedLanguage(savedLanguage);
     }
   }, []);
 
   const setLanguage = (nextLanguage: Language) => {
     localStorage.setItem("language", nextLanguage);
-    setLanguageState(nextLanguage);
+    setSelectedLanguage(nextLanguage);
   };
 
   const value = useMemo(
     () => ({
-      language,
+      language: selectedLanguage,
       setLanguage,
-      t: (key: TranslationKey) => translations[language][key],
+      t: (key: TranslationKey) => translations[selectedLanguage][key],
     }),
-    [language],
+    [selectedLanguage],
   );
 
   return (

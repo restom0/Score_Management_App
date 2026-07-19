@@ -95,9 +95,9 @@ public class CsvScoreImporter implements ApplicationRunner {
 					continue;
 				}
 
-				ScoreRecord record = parseRecord(line, rowNumber);
-				countRecord(record, counters);
-				batch.add(record);
+				ScoreRecord scoreRecord = parseRecord(line, rowNumber);
+				countRecord(scoreRecord, counters);
+				batch.add(scoreRecord);
 				if (batch.size() >= batchSize) {
 					persistBatch(batch);
 					imported += batch.size();
@@ -128,19 +128,19 @@ public class CsvScoreImporter implements ApplicationRunner {
 			throw new IllegalArgumentException("Invalid CSV column count at row " + rowNumber);
 		}
 
-		ScoreRecord record = new ScoreRecord();
-		record.setRegistrationNumber(parseRegistrationNumber(columns[0], rowNumber));
-		record.setMath(parseScore(columns[1], "toan", rowNumber));
-		record.setLiterature(parseScore(columns[2], "ngu_van", rowNumber));
-		record.setForeignLanguage(parseScore(columns[3], "ngoai_ngu", rowNumber));
-		record.setPhysics(parseScore(columns[4], "vat_li", rowNumber));
-		record.setChemistry(parseScore(columns[5], "hoa_hoc", rowNumber));
-		record.setBiology(parseScore(columns[6], "sinh_hoc", rowNumber));
-		record.setHistory(parseScore(columns[7], "lich_su", rowNumber));
-		record.setGeography(parseScore(columns[8], "dia_li", rowNumber));
-		record.setCivicEducation(parseScore(columns[9], "gdcd", rowNumber));
-		record.setForeignLanguageCode(blankToNull(columns[10]));
-		return record;
+		ScoreRecord scoreRecord = new ScoreRecord();
+		scoreRecord.setRegistrationNumber(parseRegistrationNumber(columns[0], rowNumber));
+		scoreRecord.setMath(parseScore(columns[1], "toan", rowNumber));
+		scoreRecord.setLiterature(parseScore(columns[2], "ngu_van", rowNumber));
+		scoreRecord.setForeignLanguage(parseScore(columns[3], "ngoai_ngu", rowNumber));
+		scoreRecord.setPhysics(parseScore(columns[4], "vat_li", rowNumber));
+		scoreRecord.setChemistry(parseScore(columns[5], "hoa_hoc", rowNumber));
+		scoreRecord.setBiology(parseScore(columns[6], "sinh_hoc", rowNumber));
+		scoreRecord.setHistory(parseScore(columns[7], "lich_su", rowNumber));
+		scoreRecord.setGeography(parseScore(columns[8], "dia_li", rowNumber));
+		scoreRecord.setCivicEducation(parseScore(columns[9], "gdcd", rowNumber));
+		scoreRecord.setForeignLanguageCode(blankToNull(columns[10]));
+		return scoreRecord;
 	}
 
 	private String parseRegistrationNumber(String rawValue, int rowNumber) {
@@ -185,8 +185,8 @@ public class CsvScoreImporter implements ApplicationRunner {
 		return counters;
 	}
 
-	private void countRecord(ScoreRecord record, Map<Subject, LevelCounter> counters) {
-		counters.forEach((subject, counter) -> counter.count(subject.readScore(record)));
+	private void countRecord(ScoreRecord scoreRecord, Map<Subject, LevelCounter> counters) {
+		counters.forEach((subject, counter) -> counter.count(subject.readScore(scoreRecord)));
 	}
 
 	private void persistStats(Map<Subject, LevelCounter> counters) {

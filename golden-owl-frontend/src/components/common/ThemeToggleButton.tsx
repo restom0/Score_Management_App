@@ -7,6 +7,7 @@ export const ThemeToggleButton: React.FC = () => {
 
   return (
     <button
+      type="button"
       onClick={toggleTheme}
       className="relative flex h-11 min-w-11 items-center justify-center gap-2 rounded-lg border border-emerald-200 bg-white px-3 text-sm font-semibold text-emerald-800 transition-colors hover:bg-emerald-50 dark:border-emerald-400/20 dark:bg-white/[0.05] dark:text-emerald-100 dark:hover:bg-white/[0.08]"
       aria-label={t("theme")}

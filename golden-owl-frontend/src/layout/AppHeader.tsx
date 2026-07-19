@@ -21,6 +21,7 @@ const AppHeader: React.FC = () => {
       <div className="flex w-full items-center justify-between gap-3 px-4 py-3 lg:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <button
+            type="button"
             className="z-99999 flex h-11 w-11 items-center justify-center rounded-lg border border-emerald-200 bg-white text-emerald-800 shadow-theme-xs transition-colors hover:bg-emerald-50 dark:border-emerald-400/20 dark:bg-white/[0.05] dark:text-emerald-100 dark:hover:bg-white/[0.08]"
             onClick={handleToggle}
             aria-label="Toggle sidebar"

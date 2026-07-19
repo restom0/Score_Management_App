@@ -57,8 +57,8 @@ public enum Subject {
 		return vietnameseName;
 	}
 
-	public Double readScore(ScoreRecord record) {
-		return scoreReader.apply(record);
+	public Double readScore(ScoreRecord scoreRecord) {
+		return scoreReader.apply(scoreRecord);
 	}
 
 	public static Subject fromCode(String code) {

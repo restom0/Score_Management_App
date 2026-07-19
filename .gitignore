@@ -26,10 +26,12 @@ pnpm-debug.log*
 golden-owl-frontend/node_modules/
 golden-owl-frontend/dist/
 golden-owl-frontend/dist-ssr/
+coverage/
+**/coverage/
+golden-owl-frontend/coverage/
 golden-owl-frontend/*.local
 golden-owl-frontend/.vercel/
 
 # Backend
 golden-owl-backend/target/
 golden-owl-backend/data/
-

@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,6 +36,14 @@ class GoldenOwlBackendApplicationTests {
 
 	@Test
 	void contextLoads() {
+		assertNotNull(mockMvc);
+	}
+
+	@Test
+	void reportsHealth() throws Exception {
+		mockMvc.perform(get("/api/health"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.status").value("ok"));
 	}
 
 	@Test
@@ -45,6 +54,22 @@ class GoldenOwlBackendApplicationTests {
 				.andExpect(jsonPath("$.groupATotal").value(19.65))
 				.andExpect(jsonPath("$.scores[0].code").value("math"))
 				.andExpect(jsonPath("$.scores[0].score").value(8.4));
+	}
+
+	@Test
+	void returnsBadRequestForInvalidRegistrationNumber() throws Exception {
+		mockMvc.perform(get("/api/scores/ABC"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.status").value(400))
+				.andExpect(jsonPath("$.message").value("Registration number must contain exactly 8 digits"));
+	}
+
+	@Test
+	void returnsNotFoundForMissingRegistrationNumber() throws Exception {
+		mockMvc.perform(get("/api/scores/01999999"))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.status").value(404))
+				.andExpect(jsonPath("$.message").value("No score found for registration number: 01999999"));
 	}
 
 	@Test
@@ -68,6 +93,29 @@ class GoldenOwlBackendApplicationTests {
 	}
 
 	@Test
+	void clampsTopGroupALimit() throws Exception {
+		mockMvc.perform(get("/api/reports/top-group-a?limit=0"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].registrationNumber").value("01000003"))
+				.andExpect(jsonPath("$[1]").doesNotExist());
+	}
+
+	@Test
+	void rejectsInvalidTopGroupALimit() throws Exception {
+		mockMvc.perform(get("/api/reports/top-group-a?limit=abc"))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void listsSubjects() throws Exception {
+		mockMvc.perform(get("/api/subjects"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].code").value("math"))
+				.andExpect(jsonPath("$[0].csvColumn").value("toan"))
+				.andExpect(jsonPath("$[0].nameEn").value("Math"));
+	}
+
+	@Test
 	void exposesOpenApiDocument() throws Exception {
 		mockMvc.perform(get("/v3/api-docs"))
 				.andExpect(status().isOk())
@@ -83,15 +131,15 @@ class GoldenOwlBackendApplicationTests {
 			double chemistry,
 			double literature
 	) {
-		ScoreRecord record = new ScoreRecord();
-		record.setRegistrationNumber(registrationNumber);
-		record.setMath(math);
-		record.setPhysics(physics);
-		record.setChemistry(chemistry);
-		record.setLiterature(literature);
-		record.setForeignLanguage(7.5);
-		record.setForeignLanguageCode("N1");
-		return record;
+		ScoreRecord scoreRecord = new ScoreRecord();
+		scoreRecord.setRegistrationNumber(registrationNumber);
+		scoreRecord.setMath(math);
+		scoreRecord.setPhysics(physics);
+		scoreRecord.setChemistry(chemistry);
+		scoreRecord.setLiterature(literature);
+		scoreRecord.setForeignLanguage(7.5);
+		scoreRecord.setForeignLanguageCode("N1");
+		return scoreRecord;
 	}
 
 }

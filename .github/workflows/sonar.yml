@@ -54,13 +54,17 @@ jobs:
         working-directory: golden-owl-backend
         run: chmod +x ./mvnw
 
-      - name: Build backend
+      - name: Test backend with coverage
         working-directory: golden-owl-backend
-        run: ./mvnw -B -DskipTests package
+        run: ./mvnw -B verify
 
       - name: Install frontend dependencies
         working-directory: golden-owl-frontend
         run: npm ci
+
+      - name: Test frontend with coverage
+        working-directory: golden-owl-frontend
+        run: npm run test:coverage
 
       - name: Build frontend
         working-directory: golden-owl-frontend
@@ -85,9 +89,13 @@ jobs:
             args="$args -Dsonar.organization=$SONAR_ORGANIZATION"
           fi
           args="$args -Dsonar.sources=golden-owl-backend/src/main/java,golden-owl-frontend/src"
-          args="$args -Dsonar.tests=golden-owl-backend/src/test/java"
+          args="$args -Dsonar.tests=golden-owl-backend/src/test/java,golden-owl-frontend/src"
+          args="$args -Dsonar.test.inclusions=golden-owl-frontend/src/**/*.test.ts,golden-owl-frontend/src/**/*.test.tsx,golden-owl-frontend/src/setupTests.ts"
           args="$args -Dsonar.java.binaries=golden-owl-backend/target/classes"
-          args="$args -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/target/**,**/.mvn/**,**/data/**"
+          args="$args -Dsonar.coverage.jacoco.xmlReportPaths=golden-owl-backend/target/site/jacoco/jacoco.xml"
+          args="$args -Dsonar.javascript.lcov.reportPaths=golden-owl-frontend/coverage/lcov.info"
+          args="$args -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/target/**,**/.mvn/**,**/data/**,golden-owl-frontend/src/**/*.test.ts,golden-owl-frontend/src/**/*.test.tsx,golden-owl-frontend/src/setupTests.ts,golden-owl-frontend/src/components/UserProfile/**,golden-owl-frontend/src/components/auth/**,golden-owl-frontend/src/components/charts/**,golden-owl-frontend/src/components/ecommerce/**,golden-owl-frontend/src/components/form/**,golden-owl-frontend/src/components/header/**,golden-owl-frontend/src/components/tables/**,golden-owl-frontend/src/components/ui/**,golden-owl-frontend/src/icons/**,golden-owl-frontend/src/pages/AuthPages/**,golden-owl-frontend/src/pages/Blank.tsx,golden-owl-frontend/src/pages/Calendar.tsx,golden-owl-frontend/src/pages/Charts/**,golden-owl-frontend/src/pages/Forms/**,golden-owl-frontend/src/pages/Tables/**,golden-owl-frontend/src/pages/UiElements/**,golden-owl-frontend/src/pages/UserProfiles.tsx,golden-owl-frontend/src/components/common/ChartTab.tsx,golden-owl-frontend/src/components/common/PageBreadCrumb.tsx,golden-owl-frontend/src/components/common/ThemeTogglerTwo.tsx,golden-owl-frontend/src/index.css"
+          args="$args -Dsonar.coverage.exclusions=golden-owl-backend/src/main/java/**/GoldenOwlBackendApplication.java,golden-owl-backend/src/main/java/**/config/**,golden-owl-backend/src/main/java/**/dto/**,golden-owl-backend/src/main/java/**/model/**,golden-owl-backend/src/main/java/**/seeder/**,golden-owl-frontend/src/main.tsx,golden-owl-frontend/src/App.tsx,golden-owl-frontend/src/layout/**,golden-owl-frontend/src/components/common/PageMeta.tsx,golden-owl-frontend/src/components/common/ThemeToggleButton.tsx,golden-owl-frontend/src/types/**,golden-owl-frontend/src/**/*.d.ts"
           echo "args=$args" >> "$GITHUB_OUTPUT"
 
       - name: SonarQube Scan

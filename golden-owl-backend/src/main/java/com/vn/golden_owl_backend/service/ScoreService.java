@@ -44,7 +44,7 @@ public class ScoreService {
 	 */
 	public ScoreResponse findScore(String registrationNumber) {
 		String normalizedRegistrationNumber = normalizeRegistrationNumber(registrationNumber);
-		ScoreRecord record = scoreRecordRepository.findByRegistrationNumber(normalizedRegistrationNumber)
+		ScoreRecord scoreRecord = scoreRecordRepository.findByRegistrationNumber(normalizedRegistrationNumber)
 				.orElseThrow(() -> new ScoreNotFoundException(normalizedRegistrationNumber));
 
 		List<SubjectScoreResponse> scores = Arrays.stream(Subject.values())
@@ -52,14 +52,14 @@ public class ScoreService {
 						subject.getCode(),
 						subject.getEnglishName(),
 						subject.getVietnameseName(),
-						subject.readScore(record)
+						subject.readScore(scoreRecord)
 				))
 				.toList();
 
 		return new ScoreResponse(
-				record.getRegistrationNumber(),
-				record.getForeignLanguageCode(),
-				calculateGroupATotal(record),
+				scoreRecord.getRegistrationNumber(),
+				scoreRecord.getForeignLanguageCode(),
+				calculateGroupATotal(scoreRecord),
 				scores
 		);
 	}
@@ -113,11 +113,11 @@ public class ScoreService {
 	/**
 	 * Calculates Math, Physics, and Chemistry total when all three scores exist.
 	 */
-	private Double calculateGroupATotal(ScoreRecord record) {
-		if (record.getMath() == null || record.getPhysics() == null || record.getChemistry() == null) {
+	private Double calculateGroupATotal(ScoreRecord scoreRecord) {
+		if (scoreRecord.getMath() == null || scoreRecord.getPhysics() == null || scoreRecord.getChemistry() == null) {
 			return null;
 		}
-		return record.getMath() + record.getPhysics() + record.getChemistry();
+		return scoreRecord.getMath() + scoreRecord.getPhysics() + scoreRecord.getChemistry();
 	}
 
 	/**

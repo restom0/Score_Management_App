@@ -1,22 +1,51 @@
 name: Publish Package
 
 on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - "v*.*.*"
   release:
     types:
       - published
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   packages: write
 
-env:
-  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/golden-owl-backend
-
 jobs:
+  backend-quality:
+    name: Backend quality
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: golden-owl-backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: golden-owl-backend/pom.xml
+
+      - name: Make Maven wrapper executable
+        run: chmod +x ./mvnw
+
+      - name: Run backend quality checks
+        run: ./mvnw -B verify
+
   backend-image:
     name: Publish backend image
     runs-on: ubuntu-latest
+    needs: backend-quality
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -31,16 +60,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Prepare image name
+        id: image
+        shell: bash
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/golden-owl-backend" >> "$GITHUB_OUTPUT"
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v6
         with:
-          images: ${{ env.IMAGE_NAME }}
+          images: ${{ steps.image.outputs.name }}
           tags: |
             type=ref,event=branch
             type=ref,event=tag
             type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and publish
         uses: docker/build-push-action@v7
@@ -48,6 +84,8 @@ jobs:
           context: golden-owl-backend
           file: golden-owl-backend/Dockerfile
           push: true
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
