@@ -23,9 +23,6 @@ jobs:
   deploy:
     name: Deploy frontend
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: golden-owl-frontend
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -44,6 +41,7 @@ jobs:
           exit 1
 
       - name: Install dependencies
+        working-directory: golden-owl-frontend
         run: npm ci
 
       - name: Install Vercel CLI
