@@ -11,6 +11,7 @@ import { Skeleton } from "primereact/skeleton";
 import { Tag } from "primereact/tag";
 import { scoresApi } from "../../api/scores";
 import PageMeta from "../../components/common/PageMeta";
+import type { Language } from "../../context/LanguageContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { useTheme } from "../../context/ThemeContext";
 import type {
@@ -38,6 +39,9 @@ export default function Home() {
   const [scoreLoading, setScoreLoading] = useState(false);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
   const [scoreError, setScoreError] = useState<string | null>(null);
+  const normalizedRegistrationNumber = registrationNumber.trim();
+  const canSearch = /^\d{8}$/.test(normalizedRegistrationNumber);
+  const groupALabel = `${t("math")} + ${t("physics")} + ${t("chemistry")}`;
 
   useEffect(() => {
     let ignored = false;
@@ -52,7 +56,7 @@ export default function Home() {
       })
       .catch((error: Error) => {
         if (!ignored) {
-          setDashboardError(error.message || t("loadFailed"));
+          setDashboardError(getErrorMessage(error, t("loadFailed")));
         }
       })
       .finally(() => {
@@ -141,16 +145,21 @@ export default function Home() {
 
   const handleScoreSearch = (event: FormEvent) => {
     event.preventDefault();
+    if (!canSearch) {
+      setScoreError(t("invalidRegistrationNumber"));
+      return;
+    }
+
     setScoreLoading(true);
     setScoreError(null);
     scoresApi
-      .getScore(registrationNumber)
+      .getScore(normalizedRegistrationNumber)
       .then((candidateScore) => {
         setScore(candidateScore);
       })
       .catch((error: Error) => {
         setScore(null);
-        setScoreError(error.message || t("scoreNotFound"));
+        setScoreError(getErrorMessage(error, t("loadFailed")));
       })
       .finally(() => setScoreLoading(false));
   };
@@ -217,20 +226,25 @@ export default function Home() {
               <Tag value="API" severity="success" rounded />
             </div>
 
-            <form onSubmit={handleScoreSearch} className="mb-5 flex gap-2">
+            <form onSubmit={handleScoreSearch} className="gscore-search-form mb-5">
               <InputText
                 value={registrationNumber}
-                onChange={(event) => setRegistrationNumber(event.target.value)}
+                onChange={(event) =>
+                  setRegistrationNumber(event.target.value.replace(/\D/g, "").slice(0, 8))
+                }
                 placeholder={t("searchPlaceholder")}
                 inputMode="numeric"
                 maxLength={8}
-                className="w-full"
+                aria-invalid={!canSearch}
+                className="w-full min-w-0"
               />
               <Button
                 type="submit"
                 icon="pi pi-search"
                 label={t("search")}
                 loading={scoreLoading}
+                disabled={!canSearch || scoreLoading}
+                className="gscore-search-button"
               />
             </form>
 
@@ -304,7 +318,7 @@ export default function Home() {
                 {t("topGroupA")}
               </h2>
             </div>
-            <Tag value="Toan + Vat li + Hoa hoc" severity="info" rounded />
+            <Tag value={groupALabel} severity="info" rounded />
           </div>
           <DataTable
             value={topGroupA}
@@ -415,8 +429,12 @@ function ScoreSkeleton() {
   );
 }
 
-function getSubjectName(subject: SubjectLevelStatsResponse, language: "en" | "vi") {
+function getSubjectName(subject: SubjectLevelStatsResponse, language: Language) {
   return language === "vi" ? subject.nameVi : subject.nameEn;
+}
+
+function getErrorMessage(error: Error, fallback: string) {
+  return error.message === "Failed to fetch" ? fallback : error.message || fallback;
 }
 
 function formatNumber(value: number | undefined) {

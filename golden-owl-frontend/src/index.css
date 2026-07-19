@@ -454,14 +454,104 @@ layer(base);
   color: #ffffff;
 }
 
-.gscore-language-switcher .p-button {
-  padding: 0.625rem 0.75rem;
+.gscore-language-dropdown.p-dropdown {
+  min-width: 9.25rem;
+  height: 2.75rem;
+  align-items: center;
   border-color: rgba(15, 143, 119, 0.22);
+  border-radius: 8px;
+  background: #ffffff;
 }
 
-.gscore-language-switcher .p-button.p-highlight {
+.gscore-language-dropdown .p-dropdown-label {
+  display: flex;
+  align-items: center;
+  padding: 0.55rem 0.65rem;
+}
+
+.gscore-language-dropdown .p-dropdown-trigger {
+  width: 2.1rem;
+  color: #0f8f77;
+}
+
+.gscore-language-option {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.gscore-language-code {
+  display: inline-flex;
+  min-width: 2.15rem;
+  height: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
   background: #0f8f77;
-  border-color: #0f8f77;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.gscore-language-name {
+  overflow: hidden;
+  color: #0f172a;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+
+.gscore-language-panel.p-dropdown-panel {
+  overflow: hidden;
+  border: 1px solid rgba(15, 143, 119, 0.14);
+  border-radius: 8px;
+  box-shadow: 0 18px 45px -28px rgba(15, 23, 42, 0.4);
+}
+
+.gscore-language-panel .p-dropdown-items {
+  padding: 0.35rem;
+}
+
+.gscore-language-panel .p-dropdown-item {
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+}
+
+.gscore-language-panel .p-dropdown-item.p-highlight {
+  background: rgba(15, 143, 119, 0.1);
+  color: #0f8f77;
+}
+
+.gscore-search-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.6rem;
+}
+
+@media (min-width: 640px) {
+  .gscore-search-form {
+    grid-template-columns: minmax(0, 1fr) minmax(8rem, auto);
+  }
+}
+
+.gscore-search-form .p-inputtext,
+.gscore-search-button.p-button {
+  min-height: 3rem;
+}
+
+.gscore-search-button.p-button {
+  width: 100%;
+  min-width: 8rem;
+  justify-content: center;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  white-space: nowrap;
+}
+
+.gscore-search-button .p-button-label {
+  flex: 0 0 auto;
 }
 
 .p-button {
@@ -487,6 +577,24 @@ layer(base);
   border-color: rgba(214, 245, 234, 0.14);
   background: rgba(255, 255, 255, 0.05);
   color: #ecfdf5;
+}
+
+.dark .gscore-language-name {
+  color: #ecfdf5;
+}
+
+.dark .gscore-language-panel.p-dropdown-panel {
+  border-color: rgba(214, 245, 234, 0.12);
+  background: #14211d;
+  color: #ecfdf5;
+}
+
+.dark .gscore-language-panel .p-dropdown-item {
+  color: #ecfdf5;
+}
+
+.dark .gscore-language-panel .p-dropdown-item:not(.p-highlight):hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .dark .p-inputtext::placeholder {

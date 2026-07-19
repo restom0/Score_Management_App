@@ -32,6 +32,9 @@ jobs:
           cache: maven
           cache-dependency-path: golden-owl-backend/pom.xml
 
+      - name: Make Maven wrapper executable
+        run: chmod +x ./mvnw
+
       - name: Run tests
         run: ./mvnw -B test
 
@@ -60,4 +63,3 @@ jobs:
 
       - name: Build
         run: npm run build
-

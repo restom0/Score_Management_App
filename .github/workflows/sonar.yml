@@ -50,6 +50,10 @@ jobs:
           cache: npm
           cache-dependency-path: golden-owl-frontend/package-lock.json
 
+      - name: Make Maven wrapper executable
+        working-directory: golden-owl-backend
+        run: chmod +x ./mvnw
+
       - name: Build backend
         working-directory: golden-owl-backend
         run: ./mvnw -B -DskipTests package
